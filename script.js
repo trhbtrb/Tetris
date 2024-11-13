@@ -272,20 +272,18 @@ function drawArena() {
     }
 }
 
+// Draw the Player
 function drawPlayer() {
     const m = player.matrix;
     const o = player.pos;
-
-    m.forEach((row, y) => {
-        row.forEach((value, x) => {
-            if (value !== 0) {
-                context.fillStyle = colors[player.pieceType];
-                context.fillRect((o.x + x) * blockSize, (o.y + y) * blockSize, blockSize, blockSize);
-            }
-        });
+    m.forEach(([x, y]) => {
+        const px = (x + o.x) * blockSize;
+        const py = (y + o.y) * blockSize;
+        if (py <0) return;
+        const color = colors[player.pieceType];
+        drawShadedBlock(px, py, color, context);
     });
 }
-
 
 // Draw Next Piece
 let nextPiece = null;
@@ -382,6 +380,7 @@ function playerDrop() {
 }
 
 
+
 function playerRotate(dir) {
     const prevRotation = player.rotation;
     player.rotation = (player.rotation + dir + 4) % 4; // Cycle through 0-3
@@ -395,6 +394,7 @@ function playerRotate(dir) {
 
 
 
+// Handle Input
 document.addEventListener('keydown', (event) => {
     if (gameOver) return; // Prevent controls if the game is over
 

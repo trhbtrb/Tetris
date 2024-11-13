@@ -182,19 +182,18 @@ function updateSpeedBasedOnScore() {
 function collide(arena, player) {
     const m = player.matrix;
     const o = player.pos;
-    for (let [x, y] of m) {
-        const px = o.x + x;
-        const py = o.y + y;
-        if (px < 0 || px >= arenaWidth || py >= arenaHeight) {
-            return true;
-        }
-        if (py < 0) continue;
-        if (arena[py][px] !== 0) {
-            return true;
+
+    for (let y = 0; y < m.length; y++) {
+        for (let x = 0; x < m[y].length; x++) {
+            if (m[y][x] !== 0 && 
+                (arena[y + o.y] && arena[y + o.y][x + o.x]) !== 0) {
+                return true;
+            }
         }
     }
     return false;
 }
+
 
 // Merge Player Piece into Arena
 function merge(arena, player) {
@@ -277,14 +276,17 @@ function drawArena() {
 function drawPlayer() {
     const m = player.matrix;
     const o = player.pos;
-    m.forEach(([x, y]) => {
-        const px = (x + o.x) * blockSize;
-        const py = (y + o.y) * blockSize;
-        if (py <0) return;
-        const color = colors[player.pieceType];
-        drawShadedBlock(px, py, color, context);
+
+    m.forEach((row, y) => {
+        row.forEach((value, x) => {
+            if (value !== 0) {
+                context.fillStyle = colors[player.pieceType];
+                context.fillRect((o.x + x) * blockSize, (o.y + y) * blockSize, blockSize, blockSize);
+            }
+        });
     });
 }
+
 
 // Draw Next Piece
 let nextPiece = null;

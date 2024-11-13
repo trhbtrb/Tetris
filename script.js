@@ -276,14 +276,17 @@ function drawArena() {
 function drawPlayer() {
     const m = player.matrix;
     const o = player.pos;
-    m.forEach(([x, y]) => {
-        const px = (x + o.x) * blockSize;
-        const py = (y + o.y) * blockSize;
-        if (py <0) return;
-        const color = colors[player.pieceType];
-        drawShadedBlock(px, py, color, context);
+
+    m.forEach((row, y) => {
+        row.forEach((value, x) => {
+            if (value !== 0) {
+                context.fillStyle = colors[player.pieceType];
+                context.fillRect((o.x + x) * blockSize, (o.y + y) * blockSize, blockSize, blockSize);
+            }
+        });
     });
 }
+
 
 // Draw Next Piece
 let nextPiece = null;

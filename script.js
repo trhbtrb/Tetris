@@ -370,6 +370,7 @@ function playerMove(direction) {
     }
 }
 
+
 function playerDrop() {
     player.pos.y++;
     if (collide(arena, player)) {
@@ -397,7 +398,7 @@ function playerRotate(dir) {
 
 // Handle Input
 document.addEventListener('keydown', (event) => {
-    if (gameOver) return;
+    if (gameOver) return; // Prevent controls if the game is over
 
     switch (event.key) {
         case 'ArrowLeft': // Move left
@@ -407,7 +408,7 @@ document.addEventListener('keydown', (event) => {
             playerMove(1);
             break;
         case 'ArrowDown': // Soft drop
-            dropInterval = 30; // Faster soft drop speed
+            playerDrop();
             break;
         case 'ArrowUp': // Rotate
             playerRotate(1);

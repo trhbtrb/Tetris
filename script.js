@@ -15,14 +15,14 @@ const linesElement = document.getElementById('lines');
 const linesPerLevel = 5; // Number of lines cleared required to increase level
 
 function updateLinesCleared(lines) {
-    linesCleared += lines; // Increment total lines cleared
+    linesCleared += lines; // Increment the total lines cleared
     linesElement.innerText = linesCleared; // Update the display
 
-    // Calculate the new level based on lines cleared
+    // Check if the player has reached the threshold to level up
     const newLevel = Math.floor(linesCleared / linesPerLevel) + 1;
     if (newLevel > level) {
         updateLevel(newLevel); // Update the level
-        currentDropInterval = levelDropIntervals[newLevel] || levelDropIntervals[levelDropIntervals.length - 1]; // Adjust drop speed
+        currentDropInterval = levelDropIntervals[newLevel] || levelDropIntervals[levelDropIntervals.length - 1]; // Adjust speed
     }
 }
 
@@ -86,6 +86,21 @@ function updateLevel(newLevel) {
 
 
 
+function updateLinesCleared(lines) {
+    linesCleared += lines; // Increment the total lines cleared
+    linesElement.innerText = linesCleared; // Update the display
+
+    // Calculate the new level based on lines cleared
+    const newLevel = Math.floor(linesCleared / linesPerLevel) + 1;
+    if (newLevel > level) {
+        updateLevel(newLevel); // Update the level
+        currentDropInterval = levelDropIntervals[newLevel] || levelDropIntervals[levelDropIntervals.length - 1]; // Adjust drop speed
+    }
+}
+
+
+
+
 // Game Over Flag
 let gameOver = false;
 
@@ -133,26 +148,25 @@ function updateGravitySpeed() {
 }
 
 
+// Generate a Random Piece and Update Next Piece
 function randomPiece() {
     if (nextPiece === null) {
-        // Generate initial piece
+        // Set the first piece initially
         nextPiece = generateNextPiece();
     }
-
     player.pieceType = nextPiece;
     player.rotation = 0;
     player.matrix = orientPoints(player.pieceType, player.rotation);
-    player.pos = { x: Math.floor(arenaWidth / 2) - 1, y: 0 };
+    player.pos = { x: Math.floor(arenaWidth / 2), y: 0 };
+
+    // Generate the next piece for preview
+    nextPiece = generateNextPiece();
 
     // Check for game over
     if (collide(arena, player)) {
         gameOver = true;
-        displayGameOver();
-    } else {
-        nextPiece = generateNextPiece(); // Prepare next piece
     }
 }
-
 
 
 function updateSpeedBasedOnScore() {
@@ -164,23 +178,23 @@ function updateSpeedBasedOnScore() {
 }
 
 
+// Collision Detection
 function collide(arena, player) {
-    const { matrix, pos } = player;
-
-    for (let y = 0; y < matrix.length; y++) {
-        for (let x = 0; x < matrix[y].length; x++) {
-            if (
-                matrix[y][x] !== 0 && // Non-empty cell in player piece
-                (arena[y + pos.y] && arena[y + pos.y][x + pos.x]) !== 0 // Overlapping arena cell
-            ) {
-                return true; // Collision detected
-            }
+    const m = player.matrix;
+    const o = player.pos;
+    for (let [x, y] of m) {
+        const px = o.x + x;
+        const py = o.y + y;
+        if (px < 0 || px >= arenaWidth || py >= arenaHeight) {
+            return true;
+        }
+        if (py < 0) continue;
+        if (arena[py][px] !== 0) {
+            return true;
         }
     }
-    return false; // No collision
+    return false;
 }
-
-
 
 // Merge Player Piece into Arena
 function merge(arena, player) {
@@ -263,17 +277,14 @@ function drawArena() {
 function drawPlayer() {
     const m = player.matrix;
     const o = player.pos;
-
-    m.forEach((row, y) => {
-        row.forEach((value, x) => {
-            if (value !== 0) {
-                context.fillStyle = colors[player.pieceType];
-                context.fillRect((o.x + x) * blockSize, (o.y + y) * blockSize, blockSize, blockSize);
-            }
-        });
+    m.forEach(([x, y]) => {
+        const px = (x + o.x) * blockSize;
+        const py = (y + o.y) * blockSize;
+        if (py <0) return;
+        const color = colors[player.pieceType];
+        drawShadedBlock(px, py, color, context);
     });
 }
-
 
 // Draw Next Piece
 let nextPiece = null;
@@ -350,83 +361,96 @@ function displayGameOver() {
 
 
 // Player Movement
-function playerMove(direction) {
-    player.pos.x += direction;
-    if (collide(arena, player)) {
-        player.pos.x -= direction; // Undo move if it collides
+function playerMove(dir) {
+    player.pos.x += dir;
+    if (collide(arena, player)){
+        player.pos.x -= dir;
     }
 }
 
-
+// Player Drop
 function playerDrop() {
     player.pos.y++;
     if (collide(arena, player)) {
-        player.pos.y--;
-        merge(arena, player); // Merge piece into the arena
-        sweep(); // Clear lines
-        randomPiece(); // Spawn a new piece
+        player.pos.y--; // Undo the move if there's a collision
+        merge(arena, player); // Lock the piece into the arena
+        sweep(); // Clear full rows and update lines
+        randomPiece(); // Generate the next piece
+
+        // Check for game over after placing the piece
+        if (collide(arena, player)) {
+            gameOver = true;
+        }
     }
-    dropCounter = 0; // Reset the drop timer
+    dropCounter = 0; // Reset drop counter
 }
 
 
-
+// Player Rotate
 function playerRotate(dir) {
     const prevRotation = player.rotation;
-    player.rotation = (player.rotation + dir + 4) % 4; // Cycle through 0-3
-    player.matrix = orientPoints(player.pieceType, player.rotation);
+    player.rotation = (player.rotation + dir + 4) % 4; // Increment rotation direction
+    player.matrix = orientPoints(player.pieceType, player.rotation); // Update matrix based on rotation
 
+    // Check for collisions after rotation
     if (collide(arena, player)) {
-        player.rotation = prevRotation; // Revert if collision
-        player.matrix = orientPoints(player.pieceType, prevRotation);
+        player.rotation = prevRotation; // Revert to previous rotation if collision
+        player.matrix = orientPoints(player.pieceType, player.rotation); // Revert to previous matrix
     }
 }
 
 
-
-// Handle Input
-document.addEventListener('keydown', (event) => {
-    if (gameOver) return; // Prevent controls if the game is over
+// Handle Input (Movement and Rotation)
+document.addEventListener('keydown', event => {
+    if (gameOver) return; // Disable input if game over
 
     switch (event.key) {
         case 'ArrowLeft': // Move left
             playerMove(-1);
             break;
+
         case 'ArrowRight': // Move right
             playerMove(1);
             break;
+
         case 'ArrowDown': // Soft drop
-            playerDrop();
+            isFastDropping = true; // Enable fast drop
+            currentDropInterval = fastDropInterval; // Set to fast drop interval
             break;
-        case 'ArrowUp': // Rotate
+
+        case 'ArrowUp': // Rotate clockwise
             playerRotate(1);
             break;
+
+        case 'z': // Rotate counterclockwise (if using 'Z' for counter-rotation)
+            playerRotate(-1);
+            break;
+
         case ' ': // Hard drop
             while (!collide(arena, player)) {
                 player.pos.y++;
             }
-            player.pos.y--;
-            merge(arena, player);
-            sweep();
-            randomPiece();
+            player.pos.y--; // Undo last move
+            merge(arena, player); // Lock piece
+            sweep(); // Clear rows
+            randomPiece(); // Generate next piece
             break;
-        case 'r': // Restart game
+
+        case 'r': // Reset game
         case 'R':
             resetGame();
-            break;
-        default:
             break;
     }
 });
 
-
-// Reset to gravity interval when ArrowDown key is released
+// Reset drop interval when ArrowDown is released
 document.addEventListener('keyup', event => {
     if (event.key === 'ArrowDown') {
         isFastDropping = false;
         currentDropInterval = gravityInterval; // Revert to gravity interval
     }
 });
+
 
 // Add an event listener for the "R" key to restart the game
 document.addEventListener('keydown', event => {
@@ -470,20 +494,22 @@ update();
  * Helper Functions for Enhanced Block Rendering
  */
 
+// Function to draw a block with shading to mimic original Tetris style
 function drawShadedBlock(x, y, color, ctx) {
-    ctx.fillStyle = color; // Main block color
-    ctx.fillRect(x, y, blockSize, blockSize); // Draw block
+    // Main block
+    ctx.fillStyle = color;
+    ctx.fillRect(x, y, blockSize, blockSize);
 
-    // Add highlights and shadows
-    ctx.fillStyle = lightenColor(color, 20); // Highlight color
+    // Add highlights
+    ctx.fillStyle = lightenColor(color, 20);
     ctx.fillRect(x, y, blockSize, blockSize / 4); // Top highlight
     ctx.fillRect(x, y, blockSize / 4, blockSize); // Left highlight
 
-    ctx.fillStyle = darkenColor(color, 20); // Shadow color
+    // Add shadows
+    ctx.fillStyle = darkenColor(color, 20);
     ctx.fillRect(x + (blockSize * 3) / 4, y, blockSize / 4, blockSize); // Right shadow
     ctx.fillRect(x, y + (blockSize * 3) / 4, blockSize, blockSize / 4); // Bottom shadow
 }
-
 
 // Function to lighten a hex color
 function lightenColor(color, percent) {

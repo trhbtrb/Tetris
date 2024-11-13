@@ -397,7 +397,7 @@ function playerRotate(dir) {
 
 // Handle Input
 document.addEventListener('keydown', (event) => {
-    if (gameOver) return; // Prevent controls if the game is over
+    if (gameOver) return;
 
     switch (event.key) {
         case 'ArrowLeft': // Move left
@@ -407,7 +407,7 @@ document.addEventListener('keydown', (event) => {
             playerMove(1);
             break;
         case 'ArrowDown': // Soft drop
-            playerDrop();
+            dropInterval = 30; // Faster soft drop speed
             break;
         case 'ArrowUp': // Rotate
             playerRotate(1);
@@ -432,12 +432,12 @@ document.addEventListener('keydown', (event) => {
 
 
 // Reset to gravity interval when ArrowDown key is released
-document.addEventListener('keyup', event => {
+document.addEventListener('keyup', (event) => {
     if (event.key === 'ArrowDown') {
-        isFastDropping = false;
-        currentDropInterval = gravityInterval; // Revert to gravity interval
+        dropInterval = gravityInterval; // Revert to normal gravity speed
     }
 });
+
 
 // Add an event listener for the "R" key to restart the game
 document.addEventListener('keydown', event => {

@@ -272,7 +272,6 @@ function drawArena() {
     }
 }
 
-// Draw the Player
 function drawPlayer() {
     const m = player.matrix;
     const o = player.pos;
@@ -286,6 +285,7 @@ function drawPlayer() {
         });
     });
 }
+
 
 
 // Draw Next Piece

@@ -1,0 +1,159 @@
+/* General Styling */
+:root {
+    --primary-dark: #031716;
+    --primary-teal: #0A7075;
+    --bright-teal: #0C969C;
+    --light-blue: #6BA3BE;
+    --dark-teal: #032F30;
+    --container-bg: #274D60;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    background-color: var(--primary-dark);
+    font-family: 'Segoe UI', Arial, sans-serif;
+    color: #FFFFFF;
+    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--dark-teal) 100%);
+}
+
+/* Container */
+.container {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    background-color: var(--container-bg);
+    padding: 2rem; /* 32px */
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+/* Sidebars */
+.sidebar {
+    width: 160px;
+    padding: 0.9375rem; /* 15px */
+    background-color: var(--dark-teal);
+    border-radius: 12px;
+    color: #FFFFFF;
+}
+
+/* Left Panel */
+.sidebar.left h3 {
+    font-size: 1.125rem; /* 18px */
+    color: var(--bright-teal);
+    margin: 0 0 15px 0;
+    text-transform: uppercase;
+    letter-spacing: 0.0625rem; /* 1px */
+    border-bottom: 2px solid var(--bright-teal);
+    padding-bottom: 0.5rem; /* 8px */
+}
+
+.sidebar.left p {
+    font-size: 0.875rem; /* 14px */
+    color: var(--light-blue);
+    line-height: 1.4;
+    margin: 0.5rem 0; /* 8px */
+    display: flex;
+    align-items: center;
+    gap: 0.5rem; /* 8px */
+}
+
+/* Key Styling */
+.sidebar.left .key,
+.sidebar.left .key-space {
+    background: var(--light-blue);
+    color: var(--dark-teal);
+    font-family: 'Consolas', monospace;
+    padding: 0.25rem 0.5rem; /* 4px 8px */
+    border-radius: 4px;
+    font-size: 14px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.sidebar.left .key {
+    min-width: 1.5rem; /* 24px */
+    text-align: center;
+}
+
+.sidebar.left .key-space {
+    padding: 0.25rem 0.75rem; /* 4px 12px */
+}
+
+/* Game Area */
+.game-area {
+    background-color: var(--primary-teal);
+    padding: 0.9375rem; /* 15px */
+    border-radius: 12px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+.game-area canvas {
+    border-radius: 8px;
+    background-color: var(--primary-dark);
+}
+
+/* Right Sidebar */
+.sidebar.right {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+}
+
+/* Next Block, Score, Level, Lines Boxes */
+.next-block,.score-box,.level-box,.lines-box {
+    width: 100%;
+    max-width: 120px; /* Optional for next-block */
+    padding: 20px; /* 15px */
+    background: var(--primary-teal);
+    border-radius: 12px;
+    text-align: center;
+    color: #FFFFFF;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.625rem; /* 10px */
+}
+
+.next-block canvas {
+    background-color: var(--primary-dark);
+    border-radius: 6px;
+    display: block;
+    margin: 0 auto;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+    width: 96px;
+    height: 96px;
+}
+
+.next-block h3 {
+    font-size: 1rem; /* 16px */
+    margin: 0;
+    text-transform: uppercase;
+    color: #FFFFFF;
+    text-align: center;
+}
+
+.score-box, .level-box, .lines-box {
+    padding: 1.25rem; /* Increased from 0.9375rem */
+}
+.score-box h3,
+.level-box h3,
+.lines-box h3 {
+    margin: 0;
+    font-size: 0.6875rem; /* 11px */
+    text-transform: uppercase;
+    letter-spacing: 0.0625rem; /* 1px */
+    color: #FFFFFF;
+}
+
+.score-box p,
+.level-box p,
+.lines-box p {
+    font-size: 1.5rem; /* 24px */
+    margin: 0.3125rem 0; /* 5px */
+    font-weight: bold;
+}

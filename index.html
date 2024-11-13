@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tetris Game</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Left Panel - Instructions -->
+        <div class="sidebar left">
+            <h3>Controls</h3>
+            <p><span class="key">←</span><span class="key">→</span> Move side to side</p>
+            <p><span class="key">↑</span> Rotate</p>
+            <p><span class="key">↓</span> Soft Drop (faster fall)</p>
+            <p><span class="key-space">Space</span> Hard Drop (instant drop)</p>
+            <p><span class="key">R</span> Restart Game</p>
+        </div>
+        
+        
+        
+
+        <!-- Center - Game Area -->
+        <div class="game-area">
+            <canvas id="tetris" width="240" height="480"></canvas>
+        </div>
+
+        <!-- Right Panel - Score, Level, Lines, and Next Block -->
+        <div class="sidebar right">
+            <div class="score-box">
+                <h3>Score</h3>
+                <p id="score">0</p>
+            </div>
+            <div class="level-box">
+                <h3>Level</h3>
+                <p id="level">1</p>
+            </div>
+            <div class="lines-box">
+                <h3>Lines</h3>
+                <p id="lines">0</p>
+            </div>
+            <div class="next-block">
+                <h3>Next</h3>
+                <canvas id="next" width="96" height="96"></canvas>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.2/p5.min.js"></script>
+    <script src="pieces.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

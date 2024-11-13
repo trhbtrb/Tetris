@@ -15,14 +15,14 @@ const linesElement = document.getElementById('lines');
 const linesPerLevel = 5; // Number of lines cleared required to increase level
 
 function updateLinesCleared(lines) {
-    linesCleared += lines; // Increment the total lines cleared
+    linesCleared += lines; // Increment total lines cleared
     linesElement.innerText = linesCleared; // Update the display
 
-    // Check if the player has reached the threshold to level up
+    // Calculate the new level based on lines cleared
     const newLevel = Math.floor(linesCleared / linesPerLevel) + 1;
     if (newLevel > level) {
         updateLevel(newLevel); // Update the level
-        currentDropInterval = levelDropIntervals[newLevel] || levelDropIntervals[levelDropIntervals.length - 1]; // Adjust speed
+        currentDropInterval = levelDropIntervals[newLevel] || levelDropIntervals[levelDropIntervals.length - 1]; // Adjust drop speed
     }
 }
 
@@ -86,21 +86,6 @@ function updateLevel(newLevel) {
 
 
 
-function updateLinesCleared(lines) {
-    linesCleared += lines; // Increment the total lines cleared
-    linesElement.innerText = linesCleared; // Update the display
-
-    // Calculate the new level based on lines cleared
-    const newLevel = Math.floor(linesCleared / linesPerLevel) + 1;
-    if (newLevel > level) {
-        updateLevel(newLevel); // Update the level
-        currentDropInterval = levelDropIntervals[newLevel] || levelDropIntervals[levelDropIntervals.length - 1]; // Adjust drop speed
-    }
-}
-
-
-
-
 // Game Over Flag
 let gameOver = false;
 
@@ -148,25 +133,26 @@ function updateGravitySpeed() {
 }
 
 
-// Generate a Random Piece and Update Next Piece
 function randomPiece() {
     if (nextPiece === null) {
-        // Set the first piece initially
+        // Generate initial piece
         nextPiece = generateNextPiece();
     }
+
     player.pieceType = nextPiece;
     player.rotation = 0;
     player.matrix = orientPoints(player.pieceType, player.rotation);
-    player.pos = { x: Math.floor(arenaWidth / 2), y: 0 };
-
-    // Generate the next piece for preview
-    nextPiece = generateNextPiece();
+    player.pos = { x: Math.floor(arenaWidth / 2) - 1, y: 0 };
 
     // Check for game over
     if (collide(arena, player)) {
         gameOver = true;
+        displayGameOver();
+    } else {
+        nextPiece = generateNextPiece(); // Prepare next piece
     }
 }
+
 
 
 function updateSpeedBasedOnScore() {
@@ -178,21 +164,22 @@ function updateSpeedBasedOnScore() {
 }
 
 
-// Collision Detection
 function collide(arena, player) {
-    const m = player.matrix;
-    const o = player.pos;
+    const { matrix, pos } = player;
 
-    for (let y = 0; y < m.length; y++) {
-        for (let x = 0; x < m[y].length; x++) {
-            if (m[y][x] !== 0 && 
-                (arena[y + o.y] && arena[y + o.y][x + o.x]) !== 0) {
-                return true;
+    for (let y = 0; y < matrix.length; y++) {
+        for (let x = 0; x < matrix[y].length; x++) {
+            if (
+                matrix[y][x] !== 0 && // Non-empty cell in player piece
+                (arena[y + pos.y] && arena[y + pos.y][x + pos.x]) !== 0 // Overlapping arena cell
+            ) {
+                return true; // Collision detected
             }
         }
     }
-    return false;
+    return false; // No collision
 }
+
 
 
 // Merge Player Piece into Arena
@@ -483,22 +470,20 @@ update();
  * Helper Functions for Enhanced Block Rendering
  */
 
-// Function to draw a block with shading to mimic original Tetris style
 function drawShadedBlock(x, y, color, ctx) {
-    // Main block
-    ctx.fillStyle = color;
-    ctx.fillRect(x, y, blockSize, blockSize);
+    ctx.fillStyle = color; // Main block color
+    ctx.fillRect(x, y, blockSize, blockSize); // Draw block
 
-    // Add highlights
-    ctx.fillStyle = lightenColor(color, 20);
+    // Add highlights and shadows
+    ctx.fillStyle = lightenColor(color, 20); // Highlight color
     ctx.fillRect(x, y, blockSize, blockSize / 4); // Top highlight
     ctx.fillRect(x, y, blockSize / 4, blockSize); // Left highlight
 
-    // Add shadows
-    ctx.fillStyle = darkenColor(color, 20);
+    ctx.fillStyle = darkenColor(color, 20); // Shadow color
     ctx.fillRect(x + (blockSize * 3) / 4, y, blockSize / 4, blockSize); // Right shadow
     ctx.fillRect(x, y + (blockSize * 3) / 4, blockSize, blockSize / 4); // Bottom shadow
 }
+
 
 // Function to lighten a hex color
 function lightenColor(color, percent) {

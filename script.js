@@ -237,25 +237,38 @@ function sweep() {
 
 
 function resetGame() {
+    // Reset score, lines cleared, and level
     score = 0;
-    linesCleared = 0; // Reset total lines cleared
-    level = 1; // Reset level to 1
+    linesCleared = 0;
+    level = 1;
+
+    // Reset game state
     gameOver = false;
 
+    // Clear the arena
     for (let y = 0; y < arenaHeight; y++) {
         arena[y].fill(0);
     }
 
+    // Reset gravity and drop intervals
+    currentGravityLevel = 0; // Reset gravity level
+    gravityInterval = gravityIntervals[0]; // Set gravity to initial interval
+    currentDropInterval = gravityInterval; // Set drop interval to match gravity
+    isFastDropping = false; // Ensure fast drop is disabled
+
+    // Reset drop counters
+    dropCounter = 0;
+    lastTime = 0;
+
+    // Update UI elements
     scoreElement.innerText = score;
     linesElement.innerText = linesCleared;
     levelElement.innerText = level;
 
-    currentDropInterval = levelDropIntervals[level]; // Start with fast interval
-    dropCounter = 0;
-    lastTime = 0;
-
+    // Initialize the first piece
     randomPiece();
 }
+
 
 
 

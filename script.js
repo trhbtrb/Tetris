@@ -361,57 +361,73 @@ function displayGameOver() {
 
 
 // Player Movement
-function playerMove(dir) {
-    player.pos.x += dir;
-    if (collide(arena, player)){
-        player.pos.x -= dir;
+function playerMove(direction) {
+    player.pos.x += direction;
+    if (collide(arena, player)) {
+        player.pos.x -= direction; // Undo move if it collides
     }
 }
 
-// Player Drop
 function playerDrop() {
     player.pos.y++;
     if (collide(arena, player)) {
-        player.pos.y--; // Undo the move if there's a collision
-        merge(arena, player); // Lock the piece into the arena
-        sweep(); // Clear full rows and update lines
-        randomPiece(); // Generate the next piece
-
-        // Check for game over after placing the piece
-        if (collide(arena, player)) {
-            gameOver = true;
-        }
+        player.pos.y--;
+        merge(arena, player); // Merge piece into the arena
+        sweep(); // Clear lines
+        randomPiece(); // Spawn a new piece
     }
-    dropCounter = 0; // Reset drop counter
+    dropCounter = 0; // Reset the drop timer
 }
 
 
-// Player Rotate
+
 function playerRotate(dir) {
     const prevRotation = player.rotation;
-    player.rotation = (player.rotation + dir + 4) % 4; // Increment rotation direction
-    player.matrix = orientPoints(player.pieceType, player.rotation); // Update matrix based on rotation
+    player.rotation = (player.rotation + dir + 4) % 4; // Cycle through 0-3
+    player.matrix = orientPoints(player.pieceType, player.rotation);
 
-    // Check for collisions after rotation
     if (collide(arena, player)) {
-        player.rotation = prevRotation; // Revert to previous rotation if collision
-        player.matrix = orientPoints(player.pieceType, player.rotation); // Revert to previous matrix
+        player.rotation = prevRotation; // Revert if collision
+        player.matrix = orientPoints(player.pieceType, prevRotation);
     }
 }
 
 
 // Handle Input
-document.addEventListener('keydown', event => {
-    if (event.key === ' ') { // Space bar
-        while (!collide(arena, player)) {
-            player.pos.y++;
-        }
-        player.pos.y--; // Undo last move
-        merge(arena, player); // Lock the piece into the arena
-        sweep(); // Clear full rows
-        randomPiece(); // Generate next piece
+document.addEventListener('keydown', (event) => {
+    if (gameOver) return; // Prevent controls if the game is over
+
+    switch (event.key) {
+        case 'ArrowLeft': // Move left
+            playerMove(-1);
+            break;
+        case 'ArrowRight': // Move right
+            playerMove(1);
+            break;
+        case 'ArrowDown': // Soft drop
+            playerDrop();
+            break;
+        case 'ArrowUp': // Rotate
+            playerRotate(1);
+            break;
+        case ' ': // Hard drop
+            while (!collide(arena, player)) {
+                player.pos.y++;
+            }
+            player.pos.y--;
+            merge(arena, player);
+            sweep();
+            randomPiece();
+            break;
+        case 'r': // Restart game
+        case 'R':
+            resetGame();
+            break;
+        default:
+            break;
     }
 });
+
 
 // Reset to gravity interval when ArrowDown key is released
 document.addEventListener('keyup', event => {

@@ -61,11 +61,15 @@ function createMatrix(w, h) {
 
 // Player Object
 const player = {
-    pos: {x: Math.floor(arenaWidth / 2), y: 0},
+    pos: { x: Math.floor(arenaWidth / 2), y: 0 },
     matrix: null,
     rotation: 0,
     pieceType: 0
 };
+
+// Initialize the first piece
+randomPiece();
+
 
 // Initialize Score, Lines Cleared, and Level
 let score = 0;
@@ -195,6 +199,7 @@ function collide(arena, player) {
 }
 
 
+
 // Merge Player Piece into Arena
 function merge(arena, player) {
     const m = player.matrix;
@@ -271,7 +276,6 @@ function drawArena() {
         }
     }
 }
-
 function drawPlayer() {
     const m = player.matrix;
     const o = player.pos;
@@ -285,6 +289,7 @@ function drawPlayer() {
         });
     });
 }
+
 
 
 
@@ -362,7 +367,6 @@ function displayGameOver() {
 }
 
 
-// Player Movement
 function playerMove(direction) {
     player.pos.x += direction;
     if (collide(arena, player)) {
@@ -384,6 +388,7 @@ function playerDrop() {
 
 
 
+
 function playerRotate(dir) {
     const prevRotation = player.rotation;
     player.rotation = (player.rotation + dir + 4) % 4; // Cycle through 0-3
@@ -396,7 +401,7 @@ function playerRotate(dir) {
 }
 
 
-// Handle Input
+
 document.addEventListener('keydown', (event) => {
     if (gameOver) return; // Prevent controls if the game is over
 
@@ -432,12 +437,16 @@ document.addEventListener('keydown', (event) => {
 });
 
 
+
+
 // Reset to gravity interval when ArrowDown key is released
 document.addEventListener('keyup', (event) => {
     if (event.key === 'ArrowDown') {
         dropInterval = gravityInterval; // Revert to normal gravity speed
     }
 });
+
+
 
 
 // Add an event listener for the "R" key to restart the game
